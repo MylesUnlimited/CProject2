@@ -3,28 +3,29 @@
 #include <stdlib.h>
 #include "lab2.h"
 
-int** sudoku_board;
+int** sudoku_board; // this board is shared by the threads
 int* worker_validation;
+
 
 int** read_board_from_file(char* filename){
     FILE *fp = NULL;
-    int** sudoku_board = (int**)malloc(sizeof(int*)*ROW_SIZE);
+    int** board = (int**)malloc(sizeof(int*)*ROW_SIZE);
     for(int row = 0; row < ROW_SIZE; row++){
-        sudoku_board[row] = (int*)malloc(sizeof(int)*COL_SIZE);
+	    board[row] = (int*)malloc(sizeof(int)*COL_SIZE);
     }
 
     fp = fopen(filename, "r");
 
     for(int row = 0; row < ROW_SIZE; row++){
         for(int col =0; col < COL_SIZE; col++){
-            fscanf(fp, "%d,", &sudoku_board[row][col]);
+            fscanf(fp, "%d,", &board[row][col]);
         }
     }
     fclose(fp);
-
+    sudoku_board = board;
     return sudoku_board;
 }
-
+int* worker_validation;
 void* rowValidate(void* param){
     param_struct * here = (param_struct*)param;
     int check = 0;
