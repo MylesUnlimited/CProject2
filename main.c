@@ -4,7 +4,8 @@
 
 int main(int argc, char *argv[]){
     
-    
+    int** sudoku_board = NULL;
+
     if (argc < 2){
         fprintf(stderr,"SYNOPSIS: %s <file name>\n",argv[0]);
         return 1;
