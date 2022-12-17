@@ -3,24 +3,26 @@
 #include <stdlib.h>
 #include "lab2.h"
 
+int** sudoku_board;
+int* worker_validation;
 
 int** read_board_from_file(char* filename){
     FILE *fp = NULL;
-    int** board = (int**)malloc(sizeof(int*)*ROW_SIZE);
+    int** sudoku_board = (int**)malloc(sizeof(int*)*ROW_SIZE);
     for(int row = 0; row < ROW_SIZE; row++){
-	    board[row] = (int*)malloc(sizeof(int)*COL_SIZE);
+        sudoku_board[row] = (int*)malloc(sizeof(int)*COL_SIZE);
     }
 
     fp = fopen(filename, "r");
 
     for(int row = 0; row < ROW_SIZE; row++){
         for(int col =0; col < COL_SIZE; col++){
-            fscanf(fp, "%d,", &board[row][col]);
+            fscanf(fp, "%d,", &sudoku_board[row][col]);
         }
     }
     fclose(fp);
 
-    return board;
+    return sudoku_board;
 }
 
 void* rowValidate(void* param){
@@ -58,17 +60,17 @@ void* colValidate(void* param){
     }
 }
 
-void* process_sub_grid(void* param){
+void* subGrid(void* param){
 
     param_struct * here = (param_struct*)param;
     int check = 0;
-    unsigned int r, c;
+    
     int start_row = here->starting_row;
     int start_col = here->starting_col;
 
-    for (r = start_row; r < start_row + 3; r ++) {
-        for (c = start_col; c < start_col + 3; c++) {
-            check = check + sudoku_board[r][c];
+    for (int row = start_row; row < start_row + 3; row++) {
+        for (int col = start_col; col < start_col + 3; col++) {
+            check = check + sudoku_board[row][col];
         }
     }
     /*printf("%dG ",check);*/
@@ -108,11 +110,11 @@ int is_board_valid(){
             params[l].id = l;
             params[l].starting_col = start_col;
             params[l].starting_row = start_row;
-            pthread_create(&(tid[l]),NULL, process_sub_grid, &(params[l]));
+            pthread_create(&(tid[l]),NULL, subGrid, &(params[l]));
         }
     }
     int pain = 0;
-    for (int z = 0; z < 27; z++){
+    for (int z = 0; z < NUM_OF_THREADS; z++){
         pthread_join(tid[z],(void **)&worker_validation[z]);
         if ((int)worker_validation[z] == 1){
             pain++;
