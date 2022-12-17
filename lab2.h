@@ -15,8 +15,7 @@ typedef struct {
     int ending_col;
 } param_struct;
 
-//int** sudoku_board; // this board is shared by the threads
-//int* worker_validation; // this will hold the result from each thread
+ // this will hold the result from each thread
 
 /**
  * is_board_valid - Checks if the Sudoko board is valid or not.  Returns a 0 
